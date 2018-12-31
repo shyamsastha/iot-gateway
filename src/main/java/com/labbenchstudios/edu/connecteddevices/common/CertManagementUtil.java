@@ -23,6 +23,7 @@
 package com.labbenchstudios.edu.connecteddevices.common;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -58,6 +59,8 @@ public class CertManagementUtil
 	public static final String DEFAULT_CERTIFICATE_TYPE = "X.509";
 	
 	/**
+	 * Returns the Singleton instance of {@link CertManagementUtil}.
+	 * 
 	 * @return CertManagementUtil
 	 */
 	public static final CertManagementUtil getInstance()
@@ -88,6 +91,10 @@ public class CertManagementUtil
 	 * using the Java {@link KeyStore} and {@link TrustManagerFactory}
 	 * functionality.
 	 * <p>
+	 * This will invoke the {@link #loadCertificate(String, String, String}
+	 * method using the default certificate type of {@link #DEFAULT_CERTIFICATE_TYPE}
+	 * and default socket type of {@link #DEFAULT_SOCKET_TYPE}.
+	 * <p>
 	 * On success, the certificate will be loaded by the system, stored
 	 * under a unique ID, and mapped to an {@link SSLSocketFactory}, which
 	 * is returned to the caller.
@@ -100,23 +107,87 @@ public class CertManagementUtil
 	 */
 	public SSLSocketFactory loadCertificate(String fileName)
 	{
-		try {
-			_Logger.info("Configuring " + DEFAULT_SOCKET_TYPE + " using certificate: " + fileName);
+		return loadCertificate(fileName, DEFAULT_CERTIFICATE_TYPE, DEFAULT_SOCKET_TYPE);
+	}
+	
+	/**
+	 * Attempts to load the certificate contained in 'fileName'
+	 * using the Java {@link KeyStore} and {@link TrustManagerFactory}
+	 * functionality.
+	 * <p>
+	 * On success, the certificate will be loaded by the system, stored
+	 * under a unique ID, and mapped to an {@link SSLSocketFactory}, which
+	 * is returned to the caller.
+	 * <p>
+	 * On failure, an exception will be logged, and null will be returned.
+	 * 
+	 * @param fileName The certificate file name to load.
+	 * @param certType The certificate type to load (e.g. "X.509"). If
+	 * null or otherwise invalid (e.g. empty), will use the default
+	 * {@link #DEFAULT_CERTIFICATE_TYPE}.
+	 * @param socksType The socket type to initialize (e.g. "SSL"). If
+	 * null or otherwise invalid (e.g. empty), will use the default
+	 * {@link #DEFAULT_SOCKET_TYPE}.
+	 * @return SSLSocketFactory The socket factory initialized with
+	 * the loaded certificate.
+	 */
+	public SSLSocketFactory loadCertificate(String fileName, String certType, String socksType)
+	{
+		if (fileName == null) {
+			_Logger.warning("Failed to load certificate. File name is null.");
 			
-			SSLContext sslContext = SSLContext.getInstance(DEFAULT_SOCKET_TYPE);
-			KeyStore   keyStore   = processCertificate(fileName);
+			return null;
+		} else {
+			if (! new File(fileName).exists()) {
+				_Logger.warning(
+					"Failed to load certificate. File name doesn't exist: " + fileName);
+				
+				return null;
+			}
+		}
+		
+		if (certType == null || certType.trim().length() == 0) {
+			certType = DEFAULT_CERTIFICATE_TYPE;
+			
+			_Logger.warning(
+				"Certificate type is null or empty. Using default: " + certType);
+		}
+		
+		if (socksType == null || socksType.trim().length() == 0) {
+			socksType = DEFAULT_SOCKET_TYPE;
+			
+			_Logger.warning(
+				"Socket type is null or empty. Using default: " + socksType);
+		}
+		
+		try {
+			_Logger.info(
+				"Configuring " + socksType +
+				" using " + certType +
+				" certificate from file: " + fileName);
+			
+			SSLContext sslContext = SSLContext.getInstance(socksType);
+			KeyStore   keyStore   = importCertificate(fileName, certType);
 			
 			TrustManagerFactory trustManagerFactory =
-				TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+				TrustManagerFactory.getInstance(
+					TrustManagerFactory.getDefaultAlgorithm());
 			
 			trustManagerFactory.init(keyStore);
-			sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
+			sslContext.init(
+				null, trustManagerFactory.getTrustManagers(), new SecureRandom());
 			
-			_Logger.info("Certificate load / init successful.");
+			_Logger.info(
+				certType + " certificate load and " + socksType +
+				" socket init successful from file: " + fileName);
 				
 			return sslContext.getSocketFactory();
 		} catch (Exception e) {
-			_Logger.log(Level.SEVERE, "Failed to initialize and load certificate from file: " + fileName, e);
+			_Logger.log(
+				Level.SEVERE,
+				"Failed to initialize and load " + certType +
+				" certificate from file: " + fileName,
+				e);
 		}
 		
 		return null;
@@ -126,30 +197,74 @@ public class CertManagementUtil
 	// private methods
 	
 	/**
-	 * Loads the given certificate file and stores as a uniquely named
-	 * keystore reference (based on the filename and available bytes.
+	 * Attempts to import the given certificate file and store as a uniquely
+	 * named keystore reference (based on the filename and available bytes.
 	 * 
 	 * @param fileName The file name of the certificate to process.
+	 * @param certType The certificate type to load (e.g. X.509).
 	 * @return KeyStore A reference to the {@link KeyStore} containing
 	 * the certificate.
 	 * @throws KeyStoreException
 	 * @throws NoSuchAlgorithmException
 	 * @throws CertificateException
-	 * @throws IOException
+	 * @throws IOException If an IO exception occurs, or if the file is
+	 * available, but has 0 bytes to read.
 	 */
-	private KeyStore processCertificate(String fileName)
+	private KeyStore importCertificate(String fileName, String certType)
 		throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
 	{
-	    KeyStore            ks  = KeyStore.getInstance(KeyStore.getDefaultType());
-	    FileInputStream     fis = new FileInputStream(fileName);
-	    BufferedInputStream bis = new BufferedInputStream(fis);
-	    CertificateFactory  cf  = CertificateFactory.getInstance(DEFAULT_CERTIFICATE_TYPE);
-
-	    ks.load(null);
+	    FileInputStream     fis = null;
+	    KeyStore            ks  = null;
 	    
-	    while (bis.available() > 0) {
-	        Certificate cert = cf.generateCertificate(bis);
-	        ks.setCertificateEntry(fileName + bis.available(), cert);
+	    try {
+	    	fis = new FileInputStream(fileName);
+	    	ks  = KeyStore.getInstance(KeyStore.getDefaultType());
+	    	
+	    	BufferedInputStream bis = new BufferedInputStream(fis);
+	    	CertificateFactory  cf  = CertificateFactory.getInstance(certType);
+	    	
+	    	// just want to load the keystore with no parameters, so pass in 'null'
+	    	ks.load(null);
+	    	
+	    	if (bis.available() == 0) {
+	    		_Logger.warning(
+	    			"No bytes available. Failed to import " + certType +
+	    			" from file: " + fileName);
+	    		
+	    		throw new IOException(
+	    			"File exists, but is empty. Can't import " + certType + " certificate.");
+	    	} else {
+	    		int    certCount   = 0;
+	    		File   file        = new File(fileName);
+	    		String entryPrefix = file.getName();
+	    		
+	    		// use while loop as we may have more than one cert in the file
+	    		while (bis.available() > 0) {
+	    			String      entryName = entryPrefix + "." + bis.available() + "." + ++certCount;
+	    			Certificate cert      = cf.generateCertificate(bis);
+	    			
+	    			ks.setCertificateEntry(entryName, cert);
+	    			
+	    			_Logger.info(
+	    				"Successfully imported " + certType +
+	    				" certificate using entry name " + entryName +
+	    				" from file: " + fileName);
+	    		}
+	    	}
+	    } finally {
+	    	// make sure the FileInputStream is closed in case of exception
+	    	if (fis != null) {
+	    		try {
+	    			fis.close();
+	    		} catch (Exception e) {
+	    			_Logger.log(
+	    				Level.WARNING,
+	    				"Failed to close FileInputStream: " + fileName,
+	    				e);
+	    		} finally {
+	    			fis = null;
+	    		}
+	    	}
 	    }
 	    
 		return ks;		

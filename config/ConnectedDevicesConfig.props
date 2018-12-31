@@ -3,12 +3,10 @@ apiKey         = Not Set
 userNameToken  = Not Set
 authToken      = Not Set
 protocol       = ssl
-#host           = things.ubidots.com
-host           = 50.23.124.68
+host           = things.ubidots.com
 port           = 8883
 useWebAccess   = True
-#baseUrl        = https://things.ubidots.com/api/v1.6/
-baseUrl        = https://50.23.124.68/api/v1.6/
+baseUrl        = https://things.ubidots.com/api/v1.6/
 certFile       = /home/motion/config/ubidots_cert.pem
 configPath     = /home/motion/config
 
