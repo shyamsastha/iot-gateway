@@ -1,5 +1,6 @@
-/**
- * 
+/*
+ * Module05 application using Java
+ * @author: (modified by) Shyama Sastha Krishnamoorthy Srinivasan 
  */
 package schooldomain.studentname.connecteddevices.labs.module05;
 
@@ -8,9 +9,6 @@ import java.util.logging.Logger;
 import com.labbenchstudios.edu.connecteddevices.common.BaseDeviceApp;
 import com.labbenchstudios.edu.connecteddevices.common.DeviceApplicationException;
 
-/**
- *
- */
 public class Module05App extends BaseDeviceApp
 {
 	// static
@@ -23,8 +21,13 @@ public class Module05App extends BaseDeviceApp
 	 */
 	public static void main(String[] args)
 	{
-		Module05App app = new Module05App(Module05App.class.getSimpleName(), args);
-		app.startApp();
+		Module05App app = new Module05App();
+		try {
+			app.start();
+			app.stop();
+		} catch (DeviceApplicationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	// private var's
@@ -71,6 +74,7 @@ public class Module05App extends BaseDeviceApp
 	protected void start() throws DeviceApplicationException
 	{
 		_Logger.info("Hello - module05 here!");
+		TempManagementApp.app();
 		
 	}
 	
