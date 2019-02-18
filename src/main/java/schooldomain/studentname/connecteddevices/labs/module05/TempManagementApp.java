@@ -18,6 +18,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/*
+ * Simple class to initiate a sensor object and print out data
+ * after obtaining it from a Json file generated previously
+ */
 public class TempManagementApp {
 
 	public static void app()

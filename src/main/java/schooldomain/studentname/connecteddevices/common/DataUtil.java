@@ -6,11 +6,18 @@
 package schooldomain.studentname.connecteddevices.common;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import schooldomain.studentname.connecteddevices.labs.module05.FileTransfer;
 
+/*
+ * Class that helps in parsing data from Json to object and vice-versa
+ */
 public class DataUtil {
 	
+	/*
+	 * To get data from object to Json
+	 */
 	public String SensorDataToJson(SensorData sensordata)
 	{
 		String jsonSd;
@@ -19,25 +26,24 @@ public class DataUtil {
 		return jsonSd;
 	}
 	
+	/*
+	 * To get object from Json to object
+	 */
 	public SensorData JsonToSensorData(String jsondata,String filename)
 	{
 		SensorData sensorData=null;
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		if(filename==null)
-		{
-			
-			Gson gson = new Gson();
+		{	
 			sensorData = gson.fromJson(jsondata, SensorData.class);
 			return sensorData;
 		}
 		else
 		{
-			Gson gson = new Gson();
-			String data = FileTransfer.FileReader(filename);
+			String data = FileTransfer.fileRead(filename);
 			sensorData = gson.fromJson(data, SensorData.class);
-			return sensorData;
-			
+			return sensorData;	
 		}
-			
 	}
 
 }

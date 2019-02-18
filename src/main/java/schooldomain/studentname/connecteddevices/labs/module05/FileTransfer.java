@@ -7,9 +7,15 @@ package schooldomain.studentname.connecteddevices.labs.module05;
 
 import java.io.*;
 
+/*
+ * Class to perform data trasfer between json and string
+ */
 public class FileTransfer {
 	
-	public static String FileReader(String file)
+	/*
+	 * To read file
+	 */
+	public static String fileRead(String file)
 	{
 		String json = new String();
 		try
@@ -29,6 +35,9 @@ public class FileTransfer {
 		return json;
 	}
 	
+	/*
+	 * To write file
+	 */
 	public static void fileWrite(String fileWriteEnable, String file, String json)
 	{
 		File jsonFile = new File(file);
