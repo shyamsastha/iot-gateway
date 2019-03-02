@@ -5,7 +5,7 @@
 	<groupId>schooldomain.studentname.connecteddevices</groupId>
 	<artifactId>studentname-connected-devices-java</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Schoolname - Studentname - Connected Devices (Java)</name>
+	<name>Northeastern University - Shyama Sastha Krishnamoorthy Srinivasan - Connected Devices (Java)</name>
 	<description>Java-based lab modules for the Connected Devices IoT course.</description>
 	<repositories>
 		<repository>
