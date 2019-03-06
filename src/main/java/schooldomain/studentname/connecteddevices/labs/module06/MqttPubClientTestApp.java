@@ -28,8 +28,8 @@ public class MqttPubClientTestApp {
 	public String createJSON(SensorData sensorData) {
 		data = new DataUtil();
 		SensorData sd = setSensorData(sensorData);
-		logger.info("SensorData before converting into Json\n");
-		System.out.println(data+"\n");
+		logger.info("Before conversion to Json: \n");
+		System.out.println(data + "\n");
 		String Jobj = data.SensorDataToJson(sd);
 		return Jobj;
 	}
@@ -41,8 +41,12 @@ public class MqttPubClientTestApp {
 	 */
 	public SensorData setSensorData(SensorData sensorData) {
 		sensorData.setName("Temperature Sensor");
-		sensorData.getTime();
-		sensorData.updateValue(15);
+		sensorData.updateTime();
+		sensorData.setAvgValue((double) 10);
+		sensorData.setCurValue((double) 20);
+		sensorData.setMinValue((double) 5);
+		sensorData.setMaxValue((double) 30);
+		sensorData.setSampleCount(1);
 		return sensorData;
 	}
 	
@@ -56,8 +60,8 @@ public class MqttPubClientTestApp {
 		sensorData = new SensorData(30.0,0.0,"name","Temperature");
 		mqttClient.connect();
 		String sensor = createJSON(sensorData);
-		logger.info("SensorData after converting into Json\n");
-		System.out.println(sensor+"\n");
+		logger.info("In Json format: \n");
+		System.out.println(sensor + "\n");
 		mqttClient.publishMessage(topicName, 2 , sensor.getBytes());
 	}
 	

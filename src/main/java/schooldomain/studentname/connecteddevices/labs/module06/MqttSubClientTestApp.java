@@ -48,15 +48,15 @@ public class MqttSubClientTestApp {
 		{
 			app.start(topic);
 			String message = MqttClientConnector.getMsg();			//Json Data Retrieval
-			logger.info("\nJson Recieved: \n");
-			System.out.println("Json Received: \n" + message);
+			logger.info("\nJson Recieved:");
+			System.out.println("\nJson Received: \n" + message);
 			DataUtil data = new DataUtil();								
 			SensorData sensor = data.JsonToSensorData(message,null);    //Json to SensorData Conversion
-			logger.info("\nConverted SensorData: \n");
-			System.out.println("After Json to SensorData Conversion: \n"+ sensor);
+			logger.info("\nConverted SensorData:");
+			System.out.println("\nAfter Json to SensorData Conversion: \n"+ sensor);
 			String json = data.SensorDataToJson(sensor);				//SensorData to Json Conversion
-			logger.info("\nConverted Json: \n");
-			System.out.println("After conversion back to Json: \n"+ json);
+			logger.info("\nConverted Json:");
+			System.out.println("\nAfter conversion back to Json: \n"+ json);
 		}
 		catch (Exception ex)
 		{

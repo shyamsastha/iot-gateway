@@ -1,6 +1,5 @@
 package schooldomain.studentname.connecteddevices.common;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,8 +18,6 @@ public class SensorData {
 	private String timeStamp;
 	private Integer sampleCount = 0;
 	private String name;
-	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private Date date = new Date();
 	
 	/*
 	 * Constructor
@@ -29,7 +26,7 @@ public class SensorData {
 		super();
 		this.minVal = minVal;
 		this.maxVal = maxVal;
-		this.setTime(timeStamp);
+		this.timeStamp = timeStamp;
 		this.name = name;
 	}
 	
@@ -153,10 +150,10 @@ public class SensorData {
 	}
 
 	/*
-	 * To set time
+	 * To set/update time
 	 */
-	public void setTime(String timeStamp) {
-		this.timeStamp = dateFormat.format(date);
+	public void updateTime() {
+		this.timeStamp = new SimpleDateFormat("yyyy.MM.dd HH:mm.ss").format(new Date());
 	}
 	
 	/*
@@ -166,12 +163,7 @@ public class SensorData {
 		this.timeStamp = getTime();
 		++this.sampleCount;
 		this.curVal = (double) val;
-		if (this.totVal == 0) {
-			this.totVal = (double) val;
-		}
-		else {
-			this.totVal += val;
-		}
+		this.totVal += (double) val;
 		if (this.curVal < this.minVal) {
 			this.minVal = this.curVal;
 		}

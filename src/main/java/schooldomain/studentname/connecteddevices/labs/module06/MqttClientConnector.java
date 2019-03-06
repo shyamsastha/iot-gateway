@@ -7,9 +7,6 @@ package schooldomain.studentname.connecteddevices.labs.module06;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -33,14 +30,12 @@ public class MqttClientConnector implements MqttCallback{
 	private MqttClient mqttClient;
 	private SensorData sensorData;
 	private static String mssg;
-	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private Date date = new Date();
 	
 	public MqttClientConnector()
 	{
 		if(host!=null && host.trim().length()>0)
 		{
-			this.sensorData = new SensorData(30.0, 0.0, dateFormat.format(date),"name");
+			this.sensorData = new SensorData(30.0, 0.0, "Time","name");
 			this.clientID = mqttClient.generateClientId();
 			logger.info("ClientID for connection: " + clientID);
 			this.brokerAddr = protocol + "://" + host + ":" + port;
