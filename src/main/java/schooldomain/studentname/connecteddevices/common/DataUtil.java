@@ -20,10 +20,10 @@ public class DataUtil {
 	 */
 	public String SensorDataToJson(SensorData sensordata)
 	{
-		String jsonSd;
+		String jsonsD;
 		Gson gson = new Gson();
-		jsonSd = gson.toJson(sensordata);
-		return jsonSd;
+		jsonsD = gson.toJson(sensordata);
+		return jsonsD;
 	}
 	
 	/*

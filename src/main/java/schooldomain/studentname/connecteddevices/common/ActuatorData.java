@@ -5,9 +5,6 @@
 
 package schooldomain.studentname.connecteddevices.common;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class ActuatorData {
 
 	// Command, Status and Error case type definition
@@ -22,7 +19,7 @@ public class ActuatorData {
 	public static final int ERROR_NON_RESPONSIBLE = -1;
 
 	private String name = "Actuator Data";
-	private Date timeStamp = null;
+	private String timeStamp = null;
 	private boolean hasError = false;
 	private int command = 0;
 	private int errCode = 0;
@@ -31,7 +28,7 @@ public class ActuatorData {
 	private float val = 0.0f;
 
 	
-	public ActuatorData(Date timeStamp, String name) {
+	public ActuatorData(String timeStamp, String name) {
 		this.setTime(timeStamp);
 		this.name = name;
 	}
@@ -53,14 +50,14 @@ public class ActuatorData {
 	/**
 	 * To get the date and time
 	 */
-	public Date getTime() {
+	public String getTime() {
 		return timeStamp;
 	}
 
 	/**
 	 * To set the date and time
 	 */
-	public void setTime(Date timeStamp) {
+	public void setTime(String timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 

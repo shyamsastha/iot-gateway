@@ -32,6 +32,7 @@ public class MqttClientConnector implements MqttCallback{
 	private String brokerAddr;
 	private MqttClient mqttClient;
 	private SensorData sensorData;
+	private static String mssg;
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private Date date = new Date();
 	
@@ -46,7 +47,9 @@ public class MqttClientConnector implements MqttCallback{
 			logger.info("URL for connection: " + brokerAddr);
 		}
 	}
-	
+	/*
+	 * To connect
+	 */
 	public void connect()
 	{
 		if (mqttClient == null) {
@@ -59,7 +62,7 @@ public class MqttClientConnector implements MqttCallback{
 			logger.info("Connecting to broker: " + brokerAddr);
 			mqttClient.setCallback(this);
 			mqttClient.connect(ConnOp);
-			logger.info("connected to broker: " + brokerAddr);
+			logger.info("Connected to broker: " + brokerAddr);
 		}catch(MqttException ex)
 		{
 			logger.log(Level.SEVERE, "Failed to connect to broker" + brokerAddr, ex);
@@ -68,6 +71,9 @@ public class MqttClientConnector implements MqttCallback{
 		}
 	}
 	
+	/*
+	 * To disconnect
+	 */
 	public void disconnect()
 	{
 		try {
@@ -79,6 +85,9 @@ public class MqttClientConnector implements MqttCallback{
 		}
 	}
 	
+	/*
+	 * To publish a message
+	 */
 	public boolean publishMessage(String topic, int qosLevel, byte[] payload) {
 		boolean msgSent = false;
 		try
@@ -96,7 +105,9 @@ public class MqttClientConnector implements MqttCallback{
 		return msgSent;
 	}
 
-
+	/*
+	 * To subscribe to topics
+	 */
 	public boolean subscribeToTopic(String topic)
 	{
 		boolean success = false;
@@ -109,22 +120,48 @@ public class MqttClientConnector implements MqttCallback{
 		return success;
 	}
 	
-	
+	/*
+	 * (non-Javadoc) To check for loss of connection
+	 * @see org.eclipse.paho.client.mqttv3.MqttCallback#connectionLost(java.lang.Throwable)
+	 */
 	public void connectionLost(Throwable cause) {
 		
 		logger.log(Level.WARNING, "Connection to broker lost. Retrying...", cause);
 	}
 
+	/*
+	 * (non-Javadoc) To check if message has arrived
+	 * @see org.eclipse.paho.client.mqttv3.MqttCallback#messageArrived(java.lang.String, org.eclipse.paho.client.mqttv3.MqttMessage)
+	 */
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		
+		MqttClientConnector.setMsg(message);
 		logger.info("Message arrived: " + topic + "," + message.getId());
 		System.out.print("Message recieved: " + topic + "," + message.getId() + message);
 	
 	}
 	
+	/*
+	 * (non-Javadoc) To check for completetion of delivery
+	 * @see org.eclipse.paho.client.mqttv3.MqttCallback#deliveryComplete(org.eclipse.paho.client.mqttv3.IMqttDeliveryToken)
+	 */
 	public void deliveryComplete(IMqttDeliveryToken token) {
 		
 		logger.info("Message delivered: " + token.getMessageId() + "-" + token.getResponse());
 		
+	}
+	
+	/*
+	 * To parse message as string
+	 */
+	public static String getMsg() {
+		return mssg;
+	}
+	
+	/*
+	 * To parse the message from MQTT Broker 
+	 */
+	public static void setMsg(MqttMessage message) {
+		MqttClientConnector.mssg = message.toString();
 	}
 }
