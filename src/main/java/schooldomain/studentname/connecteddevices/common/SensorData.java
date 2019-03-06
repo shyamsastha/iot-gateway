@@ -5,8 +5,6 @@ package schooldomain.studentname.connecteddevices.common;
  * @author: Shyama Sastha Krishnamoorthy Srinivasan
  */
 
-import java.util.Date;
-
 public class SensorData {
 	private Double curVal;
 	private Double maxVal;
@@ -14,18 +12,18 @@ public class SensorData {
 	private Double totVal;
 	private Double diffVal;
 	private Double avgVal;
-	private Date time;
+	private String timeStamp;
 	private Integer sampleCount = 1;
 	private String name;
 	
 	/*
 	 * Constructor
 	 */
-	public SensorData(Double minVal, Double maxVal, Date time, String name) {
+	public SensorData(Double minVal, Double maxVal, String timeStamp, String name) {
 		super();
 		this.minVal = minVal;
 		this.maxVal = maxVal;
-		this.setTime(time);
+		this.setTime(timeStamp);
 		this.name = name;
 	}
 	
@@ -144,15 +142,15 @@ public class SensorData {
 	/*
 	 * To get time
 	 */
-	public Date getTime() {
-		return time;
+	public String getTime() {
+		return timeStamp;
 	}
 
 	/*
 	 * To set time
 	 */
-	public void setTime(Date time) {
-		this.time = time;
+	public void setTime(String timeStamp) {
+		this.timeStamp = timeStamp;
 	}
 	
 	/*
@@ -162,7 +160,7 @@ public class SensorData {
 	@Override
 	public String toString() {
 		return "Name: " + name + "\n"
-				+ "Time: " + time + "n"
+				+ "Time: " + timeStamp + "n"
 				+"\n" + "Current: " + curVal + "\n"
 				+ "Average: " + avgVal + "n"
 				+"\n" + "Samples: " + sampleCount + "\n"

@@ -49,7 +49,7 @@ public class ConfigConst
 //	public static final String DEFAULT_MQTT_SERVER    = "127.0.0.1";
 	public static final int    DEFAULT_MQTT_PORT      = 1883;
 	public static final int    SECURE_MQTT_PORT       = 8883;
-	public static final int    DEFAULT_QOS_LEVEL      =    0;
+	public static final int    DEFAULT_QOS_LEVEL      =    2;
 	
 	public static final String CLOUD                  = "cloud";
 	public static final String MQTT                   = "mqtt";
