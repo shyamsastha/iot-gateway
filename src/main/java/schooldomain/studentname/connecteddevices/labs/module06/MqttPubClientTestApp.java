@@ -46,7 +46,6 @@ public class MqttPubClientTestApp {
 		sensorData.setCurValue((double) 20);
 		sensorData.setMinValue((double) 5);
 		sensorData.setMaxValue((double) 30);
-		sensorData.setSampleCount(1);
 		return sensorData;
 	}
 	
@@ -57,7 +56,7 @@ public class MqttPubClientTestApp {
 	public void start(String topicName)
 	{
 		mqttClient = new MqttClientConnector();
-		sensorData = new SensorData(30.0,0.0,"name","Temperature");
+		sensorData = new SensorData(30.0,0.0,"Time","Temperature Sensor");
 		mqttClient.connect();
 		String sensor = createJSON(sensorData);
 		logger.info("In Json format: \n");

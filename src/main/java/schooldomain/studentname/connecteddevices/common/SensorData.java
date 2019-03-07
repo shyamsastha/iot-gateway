@@ -16,7 +16,7 @@ public class SensorData {
 	private Double diffVal;
 	private Double avgVal;
 	private String timeStamp;
-	private Integer sampleCount = 0;
+	private Integer sampleCount;
 	private String name;
 	
 	/*
@@ -30,20 +30,6 @@ public class SensorData {
 		this.name = name;
 	}
 	
-	/*
-	 * To get sample count
-	 */
-	public Integer getSampleCount() {
-		return sampleCount;
-	}
-	
-	/*
-	 * To set sample count 
-	 */
-	public void setSampleCount(Integer sampleCount) {
-		this.sampleCount = sampleCount;
-	}
-
 	/*
 	 * To get average value
 	 */

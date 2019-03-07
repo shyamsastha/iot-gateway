@@ -35,7 +35,7 @@ public class MqttClientConnector implements MqttCallback{
 	{
 		if(host!=null && host.trim().length()>0)
 		{
-			this.sensorData = new SensorData(30.0, 0.0, "Time","name");
+			this.sensorData = new SensorData(30.0, 0.0, "Time","Temperature Sensor");
 			this.clientID = mqttClient.generateClientId();
 			logger.info("ClientID for connection: " + clientID);
 			this.brokerAddr = protocol + "://" + host + ":" + port;
@@ -132,7 +132,7 @@ public class MqttClientConnector implements MqttCallback{
 		
 		MqttClientConnector.setMsg(message);
 		logger.info("Message arrived: " + topic + "," + message.getId());
-		System.out.print("Message recieved: " + topic + "," + message.getId() + message);
+		System.out.print("Message recieved: " + topic + "," + message.getId() + message + "\n");
 	
 	}
 	
