@@ -4,6 +4,7 @@ package schooldomain.studentname.connecteddevices.labs.module07;
  * @modified by: Shyama Sastha Krishnamoorthy Srinivasan
  */
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CoapClientTestApp 
@@ -22,7 +23,9 @@ public class CoapClientTestApp
 		try {
 			_App.start();
 			} catch (Exception e) {
+				_Logger.log(Level.SEVERE, "ERROR 101 ", e);
 				e.printStackTrace();
+				System.exit(1);
 				}
 		}
 	

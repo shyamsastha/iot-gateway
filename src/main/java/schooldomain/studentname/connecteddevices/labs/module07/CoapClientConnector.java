@@ -11,6 +11,7 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.WebLink;
 import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapHandler;
 
 import com.labbenchstudios.edu.connecteddevices.common.ConfigConst;
 
@@ -103,6 +104,7 @@ public class CoapClientConnector
 	{
 		_Logger.info("Issuing discover...");
 		initClient();
+		_Logger.info("Retreiving all remote weblinks...");
 		Set<WebLink> wlSet = _clientConn.discover();
 		if (wlSet != null) {
 			for (WebLink wl : wlSet) {
@@ -115,7 +117,9 @@ public class CoapClientConnector
 	{
 		_Logger.info("Sending ping...");
 		initClient();
-		// TODO: you must implement this yourself (hint: it’s only one line of code)
+		if (_clientConn.ping()) {
+			_Logger.info("Ping successful!");
+			}
 		}
 	
 	public void sendDeleteRequest()
@@ -154,7 +158,7 @@ public class CoapClientConnector
 	{
 		_isInitialized = false;
 		initClient(resourceName);
-		sendGetRequest(useNON);
+		handleGetRequest(useNON);
 		}
 	
 	public void sendPostRequest(String payload, boolean useCON)
@@ -186,7 +190,7 @@ public class CoapClientConnector
 	public void registerObserver(boolean enableWait)
 	{
 		_Logger.info("Registering observer...");
-		CoapClientObserverHandler handler = null;
+		CoapHandler handler = null;
 		if (enableWait) {
 			_clientConn.observeAndWait(handler);
 			}
@@ -198,20 +202,34 @@ public class CoapClientConnector
 	// private methods
 	private void handleDeleteRequest()
 	{
-		// NOTE: you must implement this yourself
+		_Logger.info("DELETE:");
+		CoapResponse response = _clientConn.delete();
+		if(response != null) {
+			_Logger.info(
+					"Response: " + response.isSuccess() + " - " + response.getOptions() + " - " + response.getCode());
+			}else {
+				_Logger.warning("No response received.");
+				}
 		}
 	
 	private void handleGetRequest(boolean useNON)
 	{
+		_Logger.info("Sending GET request...");
 		if (useNON) {
 			_clientConn.useNONs();
 			}
-		// NOTE: you must implement the rest of this yourself
+		CoapResponse response = _clientConn.get();
+		if(response != null) {
+			_Logger.info(
+					"Response: " + response.isSuccess() + " - " + response.getOptions() + " - " + response.getCode());
+			}else {
+				_Logger.warning("No response received.");
+				}
 		}
 	
 	private void handlePutRequest(String payload, boolean useCON)
 	{
-		_Logger.info("Sending PUT...");
+		_Logger.info("Sending PUT request...");
 		CoapResponse response = null;
 		if (useCON) {
 			_clientConn.useCONs().useEarlyNegotiation(32).get();
@@ -227,7 +245,7 @@ public class CoapClientConnector
 	
 	private void handlePostRequest(String payload, boolean useCON)
 	{
-		_Logger.info("Sending POST...");
+		_Logger.info("Sending POST request...");
 		CoapResponse response = null;
 		if (useCON) {
 			_clientConn.useCONs().useEarlyNegotiation(32).get();

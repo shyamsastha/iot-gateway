@@ -39,7 +39,6 @@ public class CoapServerConnector
 			_Logger.info("Creating CoAP server instance and 'temp' handler...");
 			_coapServer = new CoapServer();
 			
-			// NOTE: you must implement TestResourceHandler yourself
 			TempResourceHandler tempHandler = new TempResourceHandler();
 			_coapServer.add(tempHandler);
 			}
