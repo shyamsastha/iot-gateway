@@ -17,7 +17,7 @@ public class TempResourceHandler extends CoapResource {
 	
 	//constructors
 	public TempResourceHandler() {
-		super("default");
+		super("temp");
 	}
 
 	/**

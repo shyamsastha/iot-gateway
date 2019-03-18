@@ -36,7 +36,7 @@ public class ConfigConst
 
 	public static final String DEFAULT_COAP_PROTOCOL  = "coap";
 	public static final String SECURE_COAP_PROTOCOL   = "coaps";
-	public static final String SECURE_COAP_SERVER    = "californium.eclipse.org";
+//	public static final String DEFAULT_COAP_SERVER    = "californium.eclipse.org";
 	public static final String DEFAULT_COAP_SERVER    = "127.0.0.1";
 	public static final int    DEFAULT_COAP_PORT      = 5683;
 	public static final int    SECURE_COAP_PORT       = 5684;

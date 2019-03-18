@@ -20,7 +20,6 @@ public class CoapServerTestApp
 	{
 		_App = new CoapServerTestApp();
 		try {
-			Thread.sleep(10000);
 			_App.start();
 			} catch (Exception e) {
 				_Logger.log(Level.SEVERE, "ERROR 101 ", e);
