@@ -38,11 +38,11 @@ public class TempResourceHandler extends CoapResource {
 	//public methods
 	
 	@Override
-	public void handleGET(CoapExchange ce) {
+	public void handleGET(CoapExchange exchange) {
 		String responseMsg =  "Response for" + super.getName() + ".";
-		ce.respond(ResponseCode.VALID, responseMsg);
+		exchange.respond(ResponseCode.VALID, responseMsg);
 		_Logger.info("Handling GET:" + responseMsg);
-		_Logger.info(ce.getRequestCode().toString() + ": " + ce.getRequestText());
+		_Logger.info(exchange.getRequestCode().toString() + ": " + exchange.getRequestText());
 	}
 	
 	@Override
