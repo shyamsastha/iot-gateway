@@ -5,6 +5,7 @@ package schooldomain.studentname.connecteddevices.labs.module07;
  */
 
 import java.util.Set;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
@@ -14,6 +15,9 @@ import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
 
 import com.labbenchstudios.edu.connecteddevices.common.ConfigConst;
+
+import schooldomain.studentname.connecteddevices.common.DataUtil;
+import schooldomain.studentname.connecteddevices.common.SensorData;
 
 public class CoapClientConnector
 {
@@ -70,20 +74,32 @@ public class CoapClientConnector
 	// public methods
 	public void runTests(String resourceName)
 	{
+		SensorData sensorData = new SensorData(30.0,0.0,"time","Temperature");
+		sensorData.updateValue(15);
+		DataUtil dataUtil = new DataUtil();
+		
 		try {
 			_isInitialized = false;
 			initClient(resourceName);
 			_Logger.info("Current URI: " + getCurrentUri());
-			String payload = "Sample payload.";
+			String payload = dataUtil.SensorDataToJson(sensorData);
 			pingServer();
 			discoverResources();
 			sendGetRequest();
 			sendGetRequest(true);
 			sendPostRequest(payload, false);
 			sendPostRequest(payload, true);
+			sendGetRequest();
+			sendGetRequest(true);
+			sensorData.updateValue(20);
+			payload = dataUtil.SensorDataToJson(sensorData);
 			sendPutRequest(payload, false);
 			sendPutRequest(payload, true);
+			sendGetRequest();
+			sendGetRequest(true);
 			sendDeleteRequest();
+			sendGetRequest();
+			sendGetRequest(true);
 			}
 		catch (Exception e) {
 			_Logger.log(Level.SEVERE, "Failed to issue request to CoAP server.", e);
@@ -200,16 +216,20 @@ public class CoapClientConnector
 		}
 	
 	// private methods
+	private void responseHandler(CoapResponse response)
+	{
+		if(response != null) {
+			_Logger.info(
+					"Response: " + response.getResponseText() + "\n Attributes: "  + response.isSuccess() + " - " + response.getOptions() + " - " + response.getCode());
+			}else {
+				_Logger.warning("No response received.");
+				}
+	}
 	private void handleDeleteRequest()
 	{
 		_Logger.info("DELETE:");
 		CoapResponse response = _clientConn.delete();
-		if(response != null) {
-			_Logger.info(
-					"Response: " + response.isSuccess() + " - " + response.getOptions() + " - " + response.getCode());
-			}else {
-				_Logger.warning("No response received.");
-				}
+		responseHandler(response);
 		}
 	
 	private void handleGetRequest(boolean useNON)
@@ -219,12 +239,7 @@ public class CoapClientConnector
 			_clientConn.useNONs();
 			}
 		CoapResponse response = _clientConn.get();
-		if(response != null) {
-			_Logger.info(
-					"Response: " + response.isSuccess() + " - " + response.getOptions() + " - " + response.getCode());
-			}else {
-				_Logger.warning("No response received.");
-				}
+		responseHandler(response);
 		}
 	
 	private void handlePutRequest(String payload, boolean useCON)
@@ -235,12 +250,7 @@ public class CoapClientConnector
 			_clientConn.useCONs().useEarlyNegotiation(32).get();
 			}
 		response = _clientConn.put(payload, MediaTypeRegistry.TEXT_PLAIN);
-		if (response != null) {
-			_Logger.info("Response: " + response.isSuccess() + " - " + response.getOptions() + " - " + response.getCode());
-			}
-		else {
-			_Logger.warning("No response received.");
-			}
+		responseHandler(response);
 		}
 	
 	private void handlePostRequest(String payload, boolean useCON)
@@ -251,12 +261,7 @@ public class CoapClientConnector
 			_clientConn.useCONs().useEarlyNegotiation(32).get();
 			}
 		response = _clientConn.post(payload, MediaTypeRegistry.TEXT_PLAIN);
-		if (response != null) {
-			_Logger.info("Response: " + response.isSuccess() + " - " + response.getOptions() + " - " + response.getCode());
-			}
-		else {
-			_Logger.warning("No response received.");
-			}
+		responseHandler(response);
 		}
 		
 	private void initClient()

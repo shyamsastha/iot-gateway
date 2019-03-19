@@ -48,6 +48,6 @@ public class CoapClientTestApp
 	public void start()
 	{
 		_coapClient = new CoapClientConnector();
-		_coapClient.runTests("temp");
+		_coapClient.runTests("Temperature");
 		}
 	}

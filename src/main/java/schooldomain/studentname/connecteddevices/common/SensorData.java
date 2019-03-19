@@ -146,19 +146,19 @@ public class SensorData {
 	 * To update value
 	 */
 	public void updateValue(float val) {
-		this.timeStamp = getTime();
-		++this.sampleCount;
+		this.updateTime();
+		//++this.sampleCount;
 		this.curVal = (double) val;
-		this.totVal += (double) val;
+		//this.totVal += (double) val;
 		if (this.curVal < this.minVal) {
 			this.minVal = this.curVal;
 		}
 		if (this.curVal > this.maxVal) {
 			this.maxVal = this.curVal;
 		}
-		if (this.totVal != 0 && this.sampleCount > 0) {
-			this.avgVal = this.totVal / this.sampleCount;
-		}
+		//if (this.totVal != 0 && this.sampleCount > 0) {
+			//this.avgVal = this.totVal / this.sampleCount;
+		//}
 	}
 	
 	/*
@@ -171,8 +171,8 @@ public class SensorData {
 				+ "Time: " + timeStamp + "n"
 				+"\n" + "Current: " + curVal + "\n"
 				+ "Average: " + avgVal + "n"
-				+"\n" + "Samples: " + sampleCount + "\n"
-				+ "Min: " + minVal + "\n" 
+				//+"\n" + "Samples: " + sampleCount + "\n"
+				+"\n" + "Min: " + minVal + "\n" 
 				+ "Max: " + maxVal + "\n";
 	}
 	
