@@ -86,20 +86,14 @@ public class CoapClientConnector
 			sensorData.updateValue(10);
 			pingServer();
 			discoverResources();
-			sendGetRequest();
 			sendGetRequest(true);
-			sendPostRequest(payload, false);
 			sendPostRequest(payload, true);
-			sendGetRequest();
 			sendGetRequest(true);
 			sensorData.updateValue(20);
 			payload = dataUtil.SensorDataToJson(sensorData);
-			sendPutRequest(payload, false);
 			sendPutRequest(payload, true);
-			sendGetRequest();
 			sendGetRequest(true);
 			sendDeleteRequest();
-			sendGetRequest();
 			sendGetRequest(true);
 			}
 		catch (Exception e) {
