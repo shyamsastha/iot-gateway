@@ -9,14 +9,14 @@ import java.util.Date;
  */
 
 public class SensorData {
-	private Double curVal;
+	private Double curVal = ((double) 0);
 	private Double maxVal;
 	private Double minVal;
-	private Double totVal;
+	private Double totVal = ((double) 0);
 	private Double diffVal;
-	private Double avgVal;
+	private Double avgVal = ((double) 0);
 	private String timeStamp;
-	private Integer sampleCount;
+	private Integer sampleCount = 0;
 	private String name;
 	
 	/*
@@ -27,6 +27,7 @@ public class SensorData {
 		this.minVal = minVal;
 		this.maxVal = maxVal;
 		this.timeStamp = timeStamp;
+		this.updateTime();
 		this.name = name;
 	}
 	
@@ -147,18 +148,18 @@ public class SensorData {
 	 */
 	public void updateValue(float val) {
 		this.updateTime();
-		//++this.sampleCount;
+		++this.sampleCount;
 		this.curVal = (double) val;
-		//this.totVal += (double) val;
+		this.totVal += (double) val;
 		if (this.curVal < this.minVal) {
 			this.minVal = this.curVal;
 		}
 		if (this.curVal > this.maxVal) {
 			this.maxVal = this.curVal;
 		}
-		//if (this.totVal != 0 && this.sampleCount > 0) {
-			//this.avgVal = this.totVal / this.sampleCount;
-		//}
+		if (this.totVal != 0 && this.sampleCount > 0) {
+			this.avgVal = this.totVal / this.sampleCount;
+		}
 	}
 	
 	/*
@@ -170,7 +171,7 @@ public class SensorData {
 		return "Name: " + name + "\n"
 				+ "Time: " + timeStamp + "n"
 				+"\n" + "Current: " + curVal + "\n"
-				+ "Average: " + avgVal + "n"
+				+ "Average: " + avgVal + "\n"
 				//+"\n" + "Samples: " + sampleCount + "\n"
 				+"\n" + "Min: " + minVal + "\n" 
 				+ "Max: " + maxVal + "\n";
