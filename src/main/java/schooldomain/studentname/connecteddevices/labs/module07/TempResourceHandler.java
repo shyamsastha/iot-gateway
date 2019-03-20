@@ -77,7 +77,7 @@ public class TempResourceHandler extends CoapResource {
 	@Override
 	public void handleDELETE(CoapExchange exchange) {
 		sensorData = null;
-		String responseMsg =  "Object delected for" + super.getName() + "." + sensorData;
+		String responseMsg =  "Object delected for " + super.getName() + ".";
 		exchange.respond(ResponseCode.DELETED, responseMsg);
 		_Logger.info("Handling DELETE: \n" + responseMsg);
 		_Logger.info(exchange.getRequestCode().toString() + ": " + exchange.getRequestText());

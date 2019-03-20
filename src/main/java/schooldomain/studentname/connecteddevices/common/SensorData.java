@@ -116,6 +116,20 @@ public class SensorData {
 	}
 	
 	/*
+	 * To get samplecount
+	 */
+	public int getsampleCount() {
+		return sampleCount;
+	}
+	
+	/*
+	 * To set total value
+	 */
+	public void setsampleCount(int sampleCount) {
+		this.sampleCount = sampleCount;
+	}
+	
+	/*
 	 * To get difference in value
 	 */
 	public Double getDiffValue() {
@@ -140,25 +154,25 @@ public class SensorData {
 	 * To set/update time
 	 */
 	public void updateTime() {
-		this.timeStamp = new SimpleDateFormat("yyyy.MM.dd HH:mm.ss").format(new Date());
+		timeStamp = new SimpleDateFormat("yyyy.MM.dd HH:mm.ss").format(new Date());
 	}
 	
 	/*
 	 * To update value
 	 */
 	public void updateValue(float val) {
-		this.updateTime();
-		++this.sampleCount;
-		this.curVal = (double) val;
-		this.totVal += (double) val;
-		if (this.curVal < this.minVal) {
-			this.minVal = this.curVal;
+		updateTime();
+		++sampleCount;
+		curVal = (double) val;
+		totVal += (double) val;
+		if (curVal < minVal) {
+			minVal = curVal;
 		}
-		if (this.curVal > this.maxVal) {
-			this.maxVal = this.curVal;
+		if (curVal > maxVal) {
+			maxVal = curVal;
 		}
-		if (this.totVal != 0 && this.sampleCount > 0) {
-			this.avgVal = this.totVal / this.sampleCount;
+		if (totVal != 0 && sampleCount > 0) {
+			avgVal = totVal / ((double) sampleCount);
 		}
 	}
 	
@@ -169,11 +183,11 @@ public class SensorData {
 	@Override
 	public String toString() {
 		return "Name: " + name + "\n"
-				+ "Time: " + timeStamp + "n"
-				+"\n" + "Current: " + curVal + "\n"
+				+ "Time: " + timeStamp + "\n"
+				+ "Current: " + curVal + "\n"
 				+ "Average: " + avgVal + "\n"
-				//+"\n" + "Samples: " + sampleCount + "\n"
-				+"\n" + "Min: " + minVal + "\n" 
+				+ "Samples: " + sampleCount + "\n"
+				+ "Min: " + minVal + "\n" 
 				+ "Max: " + maxVal + "\n";
 	}
 	

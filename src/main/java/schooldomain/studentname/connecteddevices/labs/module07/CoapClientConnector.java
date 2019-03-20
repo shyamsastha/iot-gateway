@@ -75,7 +75,7 @@ public class CoapClientConnector
 	public void runTests(String resourceName)
 	{
 		SensorData sensorData = new SensorData(0.0,30.0,"time","Temperature");
-		sensorData.updateValue(15);
+		sensorData.updateValue(10);
 		DataUtil dataUtil = new DataUtil();
 		
 		try {
@@ -83,7 +83,6 @@ public class CoapClientConnector
 			initClient(resourceName);
 			_Logger.info("Current URI: " + getCurrentUri());
 			String payload = dataUtil.SensorDataToJson(sensorData);
-			sensorData.updateValue(10);
 			pingServer();
 			discoverResources();
 			sendGetRequest(true);
