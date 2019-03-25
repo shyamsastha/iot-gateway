@@ -8,6 +8,20 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -27,9 +41,12 @@ public class MqttClientConnector implements MqttCallback{
 	private int port = ConfigConst.DEFAULT_MQTT_PORT;
 	private String clientID;
 	private String brokerAddr;
+	private String authToken = ConfigConst.API_KEY;
 	private MqttClient mqttClient;
 	private SensorData sensorData;
 	private static String mssg;
+	private String pemFileName = ConfigConst.UBIDOTS_CERT_FILE;
+	private boolean isSecureConn = true;
 	
 	public MqttClientConnector()
 	{
@@ -42,6 +59,42 @@ public class MqttClientConnector implements MqttCallback{
 			logger.info("URL for connection: " + brokerAddr);
 		}
 	}
+	
+	/**
+	* Constructor.
+	*
+	* @param host The name of the broker to connect.
+	* @param userName The username for authorizing access to the broker.
+	* @param pemFileName The name of the certificate file to use. If null / invalid, ignored.
+	*/
+	public MqttClientConnector(String _host, String _authToken, String _pemFileName)
+	{
+		super();
+		if (_host != null && _host.trim().length() > 0) {
+			host = _host;
+		}
+		if (_authToken != null && _authToken.trim().length() > 0) {
+			authToken = _authToken;
+		}
+		if (_pemFileName != null) {
+			File file = new File(_pemFileName);
+			
+			if (file.exists()) {
+				protocol = ConfigConst.SECURE_MQTT_PROTOCOL;
+				port = 8883;
+				pemFileName = _pemFileName;
+				isSecureConn = true;
+				
+				logger.info("PEM file valid. Using secure connection: " + _pemFileName);
+				} else {
+					logger.warning("PEM file invalid. Using insecure connection: " + pemFileName);
+					}
+			}
+		clientID = MqttClient.generateClientId();
+		brokerAddr = protocol + "://" + host + ":" + port;
+		logger.info("Using URL for broker conn: " + brokerAddr);
+		}
+	
 	/*
 	 * To connect
 	 */
@@ -55,6 +108,10 @@ public class MqttClientConnector implements MqttCallback{
 			MqttConnectOptions ConnOp = new MqttConnectOptions();
 			ConnOp.setCleanSession(true);
 			logger.info("Connecting to broker: " + brokerAddr);
+			// Check to use secure connection
+			if (isSecureConn) {
+			initSecureConnection(ConnOp);
+			}
 			mqttClient.setCallback(this);
 			mqttClient.connect(ConnOp);
 			logger.info("Connected to broker: " + brokerAddr);
@@ -65,6 +122,42 @@ public class MqttClientConnector implements MqttCallback{
 		
 		}
 	}
+	
+	private void initSecureConnection(MqttConnectOptions connOpts)
+	{
+		try {
+			logger.info("Configuring TLS...");
+			
+			SSLContext sslContext = SSLContext.getInstance("SSL");
+			KeyStore keyStore = readCertificate();
+			
+			TrustManagerFactory trustManagerFactory =
+					TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			trustManagerFactory.init(keyStore);
+			sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
+			
+			connOpts.setSocketFactory(sslContext.getSocketFactory());
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Failed to initialize secure MQTT connection.", e);
+				}
+		}
+	
+	private KeyStore readCertificate()
+			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
+	{
+		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+		FileInputStream fis = new FileInputStream(pemFileName);
+		BufferedInputStream bis = new BufferedInputStream(fis);
+		CertificateFactory cf = CertificateFactory.getInstance("X.509");
+		
+		ks.load(null);
+		
+		while (bis.available() > 0) {
+			Certificate cert = cf.generateCertificate(bis);
+			ks.setCertificateEntry("adk_store" + bis.available(), cert);
+			}
+		return ks;
+		}
 	
 	/*
 	 * To disconnect

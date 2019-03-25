@@ -1,5 +1,5 @@
 [ubidots.cloud]
-apiKey         = Not Set
+apiKey         = A1E-5bfa975dea61be4b84885f923c97c7040418
 userNameToken  = Not Set
 authToken      = Not Set
 protocol       = ssl
@@ -7,8 +7,8 @@ host           = things.ubidots.com
 port           = 8883
 useWebAccess   = True
 baseUrl        = https://things.ubidots.com/api/v1.6/
-certFile       = /home/motion/config/ubidots_cert.pem
-configPath     = /home/motion/config
+certFile       = /home/git/iot-gateway/config/ubidots_cert.pem
+configPath     = /home/git/iot-gateway/config
 
 [smtp.cloud]
 host           = Not Set
