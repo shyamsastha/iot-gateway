@@ -50,6 +50,7 @@ public class ConfigConst
 	public static final int    DEFAULT_MQTT_PORT      = 1883;
 	public static final int    SECURE_MQTT_PORT       = 8883;
 	public static final int    DEFAULT_QOS_LEVEL      =    2;
+	public static final String DEFAULT_API_KEY        = "A1E-5bfa975dea61be4b84885f923c97c7040418";
 	
 	public static final String CLOUD                  = "cloud";
 	public static final String MQTT                   = "mqtt";

@@ -37,15 +37,16 @@ public class MqttClientConnector implements MqttCallback{
 	
 	private static final Logger logger = Logger.getLogger(MqttClientConnector.class.getName());
 	private String protocol = ConfigConst.DEFAULT_MQTT_PROTOCOL;
-	private String host = ConfigConst.DEFAULT_MQTT_SERVER;
+	private String host;
 	private int port = ConfigConst.DEFAULT_MQTT_PORT;
 	private String clientID;
 	private String brokerAddr;
-	private String authToken = ConfigConst.API_KEY;
+	private String authToken;
+	private String userName;
 	private MqttClient mqttClient;
 	private SensorData sensorData;
 	private static String mssg;
-	private String pemFileName = ConfigConst.UBIDOTS_CERT_FILE;
+	private String pemFileName;
 	private boolean isSecureConn = true;
 	
 	public MqttClientConnector()
@@ -62,19 +63,19 @@ public class MqttClientConnector implements MqttCallback{
 	
 	/**
 	* Constructor.
-	*
 	* @param host The name of the broker to connect.
 	* @param userName The username for authorizing access to the broker.
 	* @param pemFileName The name of the certificate file to use. If null / invalid, ignored.
+	* @param authToken Token to authorize access to cloud
 	*/
-	public MqttClientConnector(String _host, String _authToken, String _pemFileName)
+	public MqttClientConnector(String _host, String _userName, String _pemFileName, String _authToken)
 	{
 		super();
 		if (_host != null && _host.trim().length() > 0) {
 			host = _host;
 		}
-		if (_authToken != null && _authToken.trim().length() > 0) {
-			authToken = _authToken;
+		if (_userName != null && _userName.trim().length() > 0) {
+			userName = _userName;
 		}
 		if (_pemFileName != null) {
 			File file = new File(_pemFileName);
@@ -90,7 +91,12 @@ public class MqttClientConnector implements MqttCallback{
 					logger.warning("PEM file invalid. Using insecure connection: " + pemFileName);
 					}
 			}
+		if (_authToken != null && _authToken.trim().length() > 0) {
+			authToken = _authToken;
+		}
+		
 		clientID = MqttClient.generateClientId();
+		logger.info("Using ClientID: " + clientID);
 		brokerAddr = protocol + "://" + host + ":" + port;
 		logger.info("Using URL for broker conn: " + brokerAddr);
 		}
@@ -123,6 +129,10 @@ public class MqttClientConnector implements MqttCallback{
 		}
 	}
 	
+	/**
+	 * To initiate the secure connection for mqtt connection
+	 * @param connOpts: The mqtt connection option which need to be set to a secure ssl context
+	 */
 	private void initSecureConnection(MqttConnectOptions connOpts)
 	{
 		try {
@@ -142,6 +152,14 @@ public class MqttClientConnector implements MqttCallback{
 				}
 		}
 	
+	/**
+	 * To read the certificate from pemFile
+	 * @return 
+	 * @throws KeyStoreException
+	 * @throws NoSuchAlgorithmException
+	 * @throws CertificateException
+	 * @throws IOException
+	 */
 	private KeyStore readCertificate()
 			throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
 	{
@@ -175,6 +193,10 @@ public class MqttClientConnector implements MqttCallback{
 	
 	/*
 	 * To publish a message
+	 * @param topic: Topic for the message
+	 * @param qosLevel: 0: at most once, 1: at least once, 2: exactly once
+	 * @param payload
+	 * @return true if publish successful, false if publish failed
 	 */
 	public boolean publishMessage(String topic, int qosLevel, byte[] payload) {
 		boolean msgSent = false;
@@ -192,9 +214,25 @@ public class MqttClientConnector implements MqttCallback{
 		}
 		return msgSent;
 	}
+	
+	/**
+	 * To subscribe to all topics
+	 * @return true if subscribe to all topics successfully, false if failed
+	 */
+	public boolean subscribeToAll() {
+		try {
+			mqttClient.subscribe("$SYS/#");
+			logger.log(Level.INFO, "Subscribed to all topics successfully.");
+			return true;
+		} catch (MqttException e) {
+			logger.log(Level.WARNING, "Failed to subscribe to all topics.", e);
+		}
+		return false;
+	}
 
 	/*
 	 * To subscribe to topics
+	 * @return true if subscribe the topic successfully, false if failed
 	 */
 	public boolean subscribeToTopic(String topic)
 	{
@@ -206,6 +244,23 @@ public class MqttClientConnector implements MqttCallback{
 			e.printStackTrace();
 		}
 		return success;
+	}
+	
+	/**
+	 * To unsubscribe from a topic
+	 * @param topic: Topic to unsubscribe from
+	 * @return true if unsubscribed successfully, false if failed
+	 */
+	public boolean unSubscribeFromTopic(String topic) {
+		try {	
+			mqttClient.unsubscribe(topic);
+			logger.log(Level.INFO, "Unsubscribed from topic " + topic + " successfully.");
+			return true;
+		} catch (MqttException e) {
+			logger.log(Level.WARNING, "Failed to unsubscribe from topic " + topic, e);
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	/*

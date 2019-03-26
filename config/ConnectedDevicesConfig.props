@@ -1,13 +1,13 @@
 [ubidots.cloud]
 apiKey         = A1E-5bfa975dea61be4b84885f923c97c7040418
-userNameToken  = Not Set
-authToken      = Not Set
+userNameToken  = krishnamoorthysrin.s
+authToken      = A1E-UectWsA40SKK5DI11B5C9yctwnwW0m
 protocol       = ssl
 host           = things.ubidots.com
 port           = 8883
 useWebAccess   = True
 baseUrl        = https://things.ubidots.com/api/v1.6/
-certFile       = /home/git/iot-gateway/config/ubidots_cert.pem
+certFile       = ubidots_cert.pem
 configPath     = /home/git/iot-gateway/config
 
 [smtp.cloud]
