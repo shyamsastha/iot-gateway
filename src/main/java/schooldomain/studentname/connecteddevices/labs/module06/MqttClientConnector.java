@@ -5,6 +5,7 @@ package schooldomain.studentname.connecteddevices.labs.module06;
  */
 
 import java.util.Arrays;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,24 +31,27 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import schooldomain.studentname.connecteddevices.common.SensorData;
+import schooldomain.studentname.connecteddevices.common.DataUtil;
 
 import com.labbenchstudios.edu.connecteddevices.common.ConfigConst;
 
 public class MqttClientConnector implements MqttCallback{
 	
 	private static final Logger logger = Logger.getLogger(MqttClientConnector.class.getName());
-	private String protocol = ConfigConst.DEFAULT_MQTT_PROTOCOL;
-	private String host;
-	private int port = ConfigConst.DEFAULT_MQTT_PORT;
+	private String protocol = ConfigConst.SECURE_MQTT_PROTOCOL;
+	private String host = "things.ubidots.com";
+	private int port = ConfigConst.SECURE_MQTT_PORT;
+	
 	private String clientID;
 	private String brokerAddr;
 	private String authToken;
 	private String userName;
 	private MqttClient mqttClient;
 	private SensorData sensorData;
+	private DataUtil dataUtil;
 	private static String mssg;
 	private String pemFileName;
-	private boolean isSecureConn = true;
+	private boolean isSecureConn = false;
 	
 	public MqttClientConnector()
 	{
@@ -68,21 +72,18 @@ public class MqttClientConnector implements MqttCallback{
 	* @param pemFileName The name of the certificate file to use. If null / invalid, ignored.
 	* @param authToken Token to authorize access to cloud
 	*/
-	public MqttClientConnector(String _host, String _userName, String _pemFileName, String _authToken)
+	public MqttClientConnector(String _host, String _pemFileName, String _authToken)
 	{
 		super();
 		if (_host != null && _host.trim().length() > 0) {
 			host = _host;
-		}
-		if (_userName != null && _userName.trim().length() > 0) {
-			userName = _userName;
 		}
 		if (_pemFileName != null) {
 			File file = new File(_pemFileName);
 			
 			if (file.exists()) {
 				protocol = ConfigConst.SECURE_MQTT_PROTOCOL;
-				port = 8883;
+				port = ConfigConst.SECURE_MQTT_PORT;
 				pemFileName = _pemFileName;
 				isSecureConn = true;
 				
@@ -101,6 +102,39 @@ public class MqttClientConnector implements MqttCallback{
 		logger.info("Using URL for broker conn: " + brokerAddr);
 		}
 	
+	
+	/**
+	 * To set the values of sensor data object
+	 * @param sensorData: SensorData class object instance
+	 */
+	public void setsenseData(SensorData sensorData) {
+		sensorData.setName("Temperature Sensor");
+		sensorData.updateValue(20);
+	}
+
+	/**
+	 * To get the sensor data object
+	 * @return sensorData: SensorData class object instance
+	 */
+	public SensorData getSensorData() {
+		Random rand = new Random();
+		float min = 15;
+		float max = 25;
+		float random = min + rand.nextFloat() * (max - min);
+		sensorData.updateValue(random);
+		return sensorData;
+	}
+	
+	/**
+	 * To create the create JSON string of sensor data and return it
+	 * @return SJobj: sensor data object in JSON string format
+	 */
+	public String createJSON() {
+		setsenseData(sensorData);
+		String SJobj = dataUtil.SensorDataToJson(getSensorData());
+		return SJobj;
+	}
+	
 	/*
 	 * To connect
 	 */
@@ -110,20 +144,25 @@ public class MqttClientConnector implements MqttCallback{
 			MemoryPersistence persistence = new MemoryPersistence();
 		try
 		{
+			System.out.println("Client ID: " + clientID);
 			mqttClient = new MqttClient(brokerAddr, clientID, persistence);
 			MqttConnectOptions ConnOp = new MqttConnectOptions();
 			ConnOp.setCleanSession(true);
+			if (authToken != null) {
+				ConnOp.setUserName(authToken);
+			}
 			logger.info("Connecting to broker: " + brokerAddr);
 			// Check to use secure connection
-			if (isSecureConn) {
-			initSecureConnection(ConnOp);
-			}
+			if (isSecureConn)
+				initSecureConnection(ConnOp);
+			
 			mqttClient.setCallback(this);
 			mqttClient.connect(ConnOp);
+			
 			logger.info("Connected to broker: " + brokerAddr);
 		}catch(MqttException ex)
 		{
-			logger.log(Level.SEVERE, "Failed to connect to broker" + brokerAddr, ex);
+			logger.log(Level.SEVERE, "Failed to connect to broker " + brokerAddr, ex);
 		}
 		
 		}
@@ -202,7 +241,7 @@ public class MqttClientConnector implements MqttCallback{
 		boolean msgSent = false;
 		try
 		{
-			logger.info("Publishing message to " + topic + ".\n payload: " + Arrays.toString(payload));
+			logger.info("Publishing message to " + topic);
 			MqttMessage msg = new MqttMessage(payload);
 			msg.setQos(qosLevel);
 			mqttClient.publish(topic, msg);
@@ -238,6 +277,7 @@ public class MqttClientConnector implements MqttCallback{
 	{
 		boolean success = false;
 		try {
+			logger.info("Subscribing to Topic: " + topic);
 			mqttClient.subscribe(topic);
 			success = true;
 		} catch (MqttException e) {
@@ -276,11 +316,12 @@ public class MqttClientConnector implements MqttCallback{
 	 * (non-Javadoc) To check if message has arrived
 	 * @see org.eclipse.paho.client.mqttv3.MqttCallback#messageArrived(java.lang.String, org.eclipse.paho.client.mqttv3.MqttMessage)
 	 */
+	
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		
 		MqttClientConnector.setMsg(message);
 		logger.info("Message arrived: " + topic + "," + message.getId());
-		System.out.print("Message recieved: " + topic + "," + message.getId() + message + "\n");
+		System.out.print("Message recieved: " + topic + "," + message.getId() + ": "+ message + "\n");
 	
 	}
 	
@@ -288,6 +329,7 @@ public class MqttClientConnector implements MqttCallback{
 	 * (non-Javadoc) To check for completetion of delivery
 	 * @see org.eclipse.paho.client.mqttv3.MqttCallback#deliveryComplete(org.eclipse.paho.client.mqttv3.IMqttDeliveryToken)
 	 */
+	
 	public void deliveryComplete(IMqttDeliveryToken token) {
 		
 		logger.info("Message delivered: " + token.getMessageId() + "-" + token.getResponse());

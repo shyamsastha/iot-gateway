@@ -31,7 +31,7 @@ package com.labbenchstudios.edu.connecteddevices.common;
 public class ConfigConst
 {
 	public static final String SECTION_SEPARATOR        = ".";
-	public static final String DATA_PATH                = "/home/git/iot-gateway/config/";
+	public static final String DATA_PATH                = "/home/shyam/git/iot-gateway/config/";
 	public static final String DEFAULT_CONFIG_FILE_NAME = DATA_PATH + "ConnectedDevicesConfig.props";
 
 	public static final String DEFAULT_COAP_PROTOCOL  = "coap";
@@ -49,7 +49,7 @@ public class ConfigConst
 //	public static final String DEFAULT_MQTT_SERVER    = "127.0.0.1";
 	public static final int    DEFAULT_MQTT_PORT      = 1883;
 	public static final int    SECURE_MQTT_PORT       = 8883;
-	public static final int    DEFAULT_QOS_LEVEL      =    2;
+	public static final int    DEFAULT_QOS_LEVEL      =    0;
 	public static final String DEFAULT_API_KEY        = "A1E-5bfa975dea61be4b84885f923c97c7040418";
 	
 	public static final String CLOUD                  = "cloud";
